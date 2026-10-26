@@ -10,10 +10,11 @@ GPT 主导的静态视觉创作工作流：导演构思、原生图像生成与�
 |---|---|---|
 | 中文原版 | [gpt-visual-director](gpt-visual-director/) | [使用与安装](gpt-visual-director/README.md) |
 | English | [gpt-visual-director-en](gpt-visual-director-en/) | [Usage and installation](gpt-visual-director-en/README.md) |
+| Codex / GPT 工作流 | [codex-visual-director](codex-visual-director/) | [Codex 专用指南](docs/CODEX_GUIDE.zh-CN.md) |
 
-Both editions include the full workflow, three reference documents, two templates, display metadata, and 12 manual evaluation cases. The Chinese source is preserved; the English edition uses its own skill identifier.
+The original Chinese and English editions include the full workflow, three reference documents, two templates, display metadata, and 12 manual evaluation cases. The Chinese source is preserved; the English edition uses its own skill identifier. The separate Codex edition adds workspace-based continuity, layout guidance, and a small local version-management tool, using GPT and native OpenAI image tools.
 
-两版均包含完整工作流、三份参考规则、两份模板、显示元数据和 12 个手动测试用例。中文原版保留原有内容，英文版使用独立的技能标识。
+原有中英文两版均包含完整工作流、三份参考规则、两份模板、显示元数据和 12 个手动测试用例。中文原版保留原有内容，英文版使用独立的技能标识。Codex 专用版另行补充工作区接续、布局规范和本地版本工具，只使用 GPT 与 OpenAI 原生图像能力。
 
 ## Workflow / 工作流
 
