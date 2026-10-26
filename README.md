@@ -12,9 +12,9 @@ GPT 主导的静态视觉创作工作流：导演构思、原生图像生成与�
 | English | [gpt-visual-director-en](gpt-visual-director-en/) | [Usage and installation](gpt-visual-director-en/README.md) |
 | Codex / GPT 工作流 | [codex-visual-director](codex-visual-director/) | [Codex 专用指南](docs/CODEX_GUIDE.zh-CN.md) |
 
-The original Chinese and English editions include the full workflow, three reference documents, two templates, display metadata, and 12 manual evaluation cases. The Chinese source is preserved; the English edition uses its own skill identifier. The separate Codex edition adds workspace-based continuity, layout guidance, and a small local version-management tool, using GPT and native OpenAI image tools.
+The original Chinese and English editions include the full workflow, three reference documents, two templates, display metadata, and 12 manual evaluation cases. The Chinese source is preserved; the English edition uses its own skill identifier. Codex v1.1.0 adds explicit visual alignment, match-first critique, executable PNG/SVG text layout, searchable technique cards, and workspace-based version management, using GPT and native OpenAI image tools.
 
-原有中英文两版均包含完整工作流、三份参考规则、两份模板、显示元数据和 12 个手动测试用例。中文原版保留原有内容，英文版使用独立的技能标识。Codex 专用版另行补充工作区接续、布局规范和本地版本工具，只使用 GPT 与 OpenAI 原生图像能力。
+原有中英文两版均包含完整工作流、三份参考规则、两份模板、显示元数据和 12 个手动测试用例。中文原版保留原有内容，英文版使用独立的技能标识。Codex v1.1.0 补充视觉对齐、先匹配后细审、可运行 PNG/SVG 排版、可检索招式和本地版本工具，使用 GPT 与 OpenAI 原生图像能力。
 
 ## Workflow / 工作流
 
@@ -31,4 +31,4 @@ Choose an edition and follow its installation notes for the host you use. Clonin
 
 选择一个语言版本，并按对应说明在支持技能的宿主中安装。下载本仓库不等于安装完成。图像能力由宿主提供；本技能不会自动接入 Photoshop、ComfyUI 或外部绘图后端，经验卡也不等于自动跨会话记忆。
 
-Version / 版本: 1.0.0
+ChatGPT editions / 原中英文版: 1.0.0 · Codex edition / Codex 版: 1.1.0

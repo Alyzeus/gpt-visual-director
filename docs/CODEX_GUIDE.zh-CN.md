@@ -1,128 +1,111 @@
 # Codex Visual Director · GPT 静态视觉工作流
 
-版本 1.0.0 · 2026-10-26
+版本 1.1.0 · 2026-10-26
 
-这是为 Codex 单独编写的 Skill，不是把 ChatGPT 版更换名字。GPT 负责理解需求、导演决策、制作规划、真实审图、返工和项目接续；图像制作使用当前宿主实际提供的 OpenAI 原生图像工具。精确文字或几何在任务需要时由 GPT 编写并运行本地代码处理。
+GPT 负责需求、导演决策、布局、真实审图、定向修改、版本裁决与项目接续；绘画性内容使用当前宿主实际提供的 OpenAI 原生图像工具。准确文字与几何按需使用确定性代码。本版不接入 ComfyUI、第三方模型、外部生图服务或 Photoshop，不要求新增模型密钥。
 
-[技能目录](../codex-visual-director/) · [核心指令](../codex-visual-director/SKILL.md) · [项目文件工具](../codex-visual-director/scripts/project.py)
+[技能目录](../codex-visual-director/) · [核心指令](../codex-visual-director/SKILL.md) · [工具回归检查](../tests/test_codex_tools.py)
 
-不包含 ComfyUI、第三方模型、第三方绘图 API 或 Photoshop 操作步骤，也不要求新增密钥。模型沿用用户在 Codex 中选择的 GPT；Skill 不强制换模型。原生图像工具缺失时，应明确报告，不能暗中切换服务。
+## 1. 本次升级
 
-## 1. 从已有研究保留什么
+D0–D5 保留。新增视觉选参、Brief 修订与检查点、开工卡、先匹配后细审、参考用途记录、可检索招式和小型排版模块。已有明确方向且授权充足时连续执行；不增加逐步审批，也不强制先生成三张候选图。
 
-| 来源 | 纳入本版的机制 | 本版的处理 |
+| 模块 | v1.1.0 实际提供 | 范围 |
 |---|---|---|
-| GPT Visual Director v1.0.0 | D0–D5、真实审图、定向修改、回退、经验分级 | 针对工作区文件和本地图片输入改写 |
-| 《图像设计工作流实践参考》 | 参考关系、材料行为、局部反馈继承原目标 | 约束编号与完整 Brief 优先，不只读取最新修改点 |
-| 《导演型 Agent 与生图模型定位：四次实验总结》 | 导演负责取舍；技术成功不等于创作成功 | 先有表达主张再选制作方式，不以华丽度代替叙事 |
-| 《设计交付闭环·方法论》及后续评估 | 可重渲、成品检查、失败归因 | 每轮一个主要假设；不照搬固定扣分、七轮修改或强制换方案 |
-| Art Director 2.0 增量升级研究 | 实质不同的方案、选择与否决、布局规划、策略止损 | GPT 单主控，保留机制，移除原项目的软件调度 |
-| 上下文与跨电脑迁移研究 | 唯一有效简报、状态与知识分层、恢复实测 | 少量项目文件、相对路径、按需经验卡，不捆绑旧素材库 |
-| 后续迁移验收摘要 | 回退与恢复不能只写在文档；布局字段要兑现 | 附可运行文件工具；布局合同不冒充已实现渲染器 |
-| 《雨后的回眸》试验 | 目标改善与非目标偏移分开、可否决新版 | 编辑输入关联未暴露时记 unverified，不凭图相似就算精确编辑 |
+| Layout Planner | 布局规范、可运行 PNG/SVG 渲染、墨迹几何检查 | 基础中英文横排与背景合成；不是任意字形或专业印前引擎 |
+| Design Critique | 实际看图；先比对批准方向，再做 Brief / Design / Craft 三视角自查 | 匹配结论附可见证据，没有统一 70 分门槛 |
+| Design Loop | 归因、单轮修改协议、预算、回退与停止；真实文件工具 | 不自带自动生图调度器；默认最多三次修改，有新方法及授权预算才延长 |
+| Style Kit | 当前项目的色彩、字体角色、构图、身份与材质模板 | 引用当前 Brief 与参考，不自动继承旧项目风格 |
+| 招式库 | 7 张结构化种子卡、关键词检索、向项目库新增 | 6 张 proposed、1 张历史 reported/observed；不自动验证或晋级 |
+| 项目接续 | 相对路径状态、有效 Brief、版本与检查点 | 旧 schema_version=1 项目兼容；保存不等于已验证恢复 |
 
-这些材料用于设计方法的综合，没有把其他系统的代码、模型能力、测试数字或图库迁入本项目。历史试验不算本 Codex 版本已完成的生图验收。
+原 ChatGPT 中英文版本仍为 1.0.0，文件保持原样；本次升级针对单独的 Codex 版。
 
-## 2. 职责与制作方式
+## 2. D0–D5
 
-| 部分 | 实际职责 |
+| 阶段 | 执行动作与完成依据 |
 |---|---|
-| GPT | 需求、参考理解、创意选择、布局、审图、返工、状态维护 |
-| OpenAI 原生图像工具 | 生成或编辑绘画性主视觉、人物、材质、环境 |
-| 项目内 SVG/HTML/渲染代码（需要时） | 精确文字、几何和代码原生视觉，实际运行后查看成品 |
-| `project.py` | 保存已有文件、登记版本、选回旧稿、读取状态；不生成也不审图 |
-| 用户 | 决定关键方向及最终接受；不要求每个小步骤重复批准 |
+| D0 需求 | 读完整 Brief 与参考，编号 H 条件；必要时视觉选参；记录 BR 修订、术语可见特征及采用依据 |
+| D1 导演 | 明确表达机制和布局，按问题检索少量招式；短自检确认输入、工具、字体、文案及预算可用 |
+| D2 制作 | 实际调用原生图像工具或适当的确定性排版；登记真实结果，编辑输入未核验就保持 unverified |
+| D3 审查 | 先判断是否匹配批准方向，再检查 Brief / Design / Craft；实际看全图和必要局部 |
+| D4 裁决 | 根据目标收益与非目标偏移选择接受、修改、重做、回退或止损；回退必须取回真实旧稿 |
+| D5 交付 | 交作品，记录选定主版、未达项和用户接受状态；经验按证据入库，给出下一步 |
 
-默认一个 GPT 工作。三个审核视角不是三个独立模型。隔离 GPT 冷读复核仅在用户要求且环境允许时使用，也不等于人工终审。
+Quick 任务可压缩执行。规则 VD-R01–VD-R10 用于引用技能要求，H01 等用于当前项目约束。默认一个 GPT；三视角自查不称三个独立模型。
 
-## 3. D0–D5 在 Codex 中怎样执行
+## 3. 项目文件与工具
 
-| 阶段 | 动作 | 完成依据 |
-|---|---|---|
-| D0 需求 | 读取已有状态、完整 Brief 和参考，区分硬约束与偏好 | 当前有效要求可定位，局部反馈未抹掉原目标 |
-| D1 导演 | 建立画面主张；必要时提出两个实质不同方向，决定布局与制作方式 | 有选择和否决理由，方案能转成可制作的画面任务 |
-| D2 制作 | 原生生成/编辑或适当的确定性渲染，保存实际结果 | 真有产物，输入依据与产物引用清楚；不只写提示词 |
-| D3 审查 | 看全图和必要局部，分别检查 Brief / Design / Craft | 每项有可见证据，硬伤不被平均分抵消 |
-| D4 裁决 | 接受、局部改、重做、回退、重提方向或停止 | 新旧版实际比较；回退能取回旧文件；无收益就止损 |
-| D5 交付 | 交作品和必要记录，更新下一步，按证据沉淀经验 | 明确当前主版、已知局限及用户接受状态，能从文件接续 |
-
-Quick 可压缩为约束—执行—检查—交付；Deep 才展开全部项目资料。用户只想讨论或审图时，不进入生成。默认一张基线加最多三次修改，连续两轮无确认改善时重新归因，不凑次数。
-
-## 4. 项目文件与真实回退
-
-需要多轮或跨会话接续时，在自己的创作工作目录中建立项目，不把作品写进 Skill 安装目录：
+多轮或需要接续时，作品放在自己的项目目录，技能安装目录保留为工具源。主要文件为 brief.md、TASK_STATE.json、art-direction.md、review-log.md、真实版本及选定稿；按需增加 style-kit.json、style-cards.json 和使用中的布局源文件。
 
 ```text
-my-visual-project/
-  brief.md
-  TASK_STATE.json
-  TASK_STATE.previous.json
-  art-direction.md          # 需要记录方向时建立
-  review-log.md             # 审查、运行与预算记录
-  versions/v001/artifact.png
-  versions/v002/artifact.png
-  selected/v001.png
-  style-cards/              # 需要沉淀经验时建立
-```
-
-最新制作版可以是 V2，而选定主版是 V1。这两个状态分开保存。`select` 从旧版复制真实文件到选定稿路径，不覆盖已有不同内容，不删除候选，也不改写 Git 历史。
-
-文件工具仅需 Python 3 标准库，支持以下命令。将占位符换成本机实际路径；Windows 可使用本机的 `python` 或 `py`。
-
-```text
-python <skill目录>/scripts/project.py init <项目目录> --title "雨后的回眸"
+python <skill目录>/scripts/project.py init <项目目录> --title "项目名"
 python <skill目录>/scripts/project.py add <项目目录> <实际首稿.png> --id v001
 python <skill目录>/scripts/project.py add <项目目录> <实际新版.png> --id v002 --parent v001 --edit-input unverified
-python <skill目录>/scripts/project.py select <项目目录> v001 --reason "V2 的目标收益有限，保留 V1"
-python <skill目录>/scripts/project.py update <项目目录> --stage D5 --next "等待用户接受选定稿"
+python <skill目录>/scripts/project.py select <项目目录> v001 --reason "新版目标收益有限"
 python <skill目录>/scripts/project.py status <项目目录>
 ```
 
-脚本只核实文件管理动作，不能证明有效图像、视觉质量、实际编辑输入或用户接受。参数 `confirmed` 必须有可记录的实际编辑输入证据；没有就保持 unverified。
+project.py 仅需 Python 标准库。最新制作版与选定主版分开；不覆盖不同内容、不改写 Git 历史。新增 reference 与 checkpoint 子命令记录来源、用途、检查依据和 Brief 修订，具体命令见 [状态说明](../codex-visual-director/references/state-and-memory.md)。它们只登记，不自动看图、批准或验证实际编辑输入。
 
-日常图片不强制 SHA256 或完整像素差分；版本号、真实路径、必要局部对照通常足够。不要从登记文件数量推算生图调用次数，失败调用也可能消耗预算。
+日常图片不强制 SHA256 或全图差分。不从登记文件数推算生图调用次数；费用未知就记录未知。
 
-## 5. Layout Planner 的边界
-
-海报可以先规划文字区、主体保护区和阅读层级，再选择整图生成或主视觉与文字分开制作。后者需要项目实际具有可运行的渲染代码；没有附带或执行渲染器，就不能称精确排版已实现。
-
-本 Skill 附布局规范与示例，不附通用排版引擎。渲染时须验证字体、换行、行距、锚点和保护区；成品里的可见字高、墨迹间距与裁切仍要检查。不能用“字号正确”“JSON 合法”替代成品核验。
-
-用户要插画时使用图像工具，不用 SVG 线框占位。SVG/HTML 仅用于适合的精确或代码原生部分；栅格素材不会因此变成可编辑绘画图层。
-
-## 6. 在 PC 的 Codex 中安装
-
-推荐让 Codex 的安装器读取本仓库的 **`codex-visual-director` 子目录**，不要把整个仓库作为一个技能目录：
+## 4. 可运行排版
 
 ```text
-请使用 $skill-installer，从 Alyzeus/gpt-visual-director 仓库的 codex-visual-director 目录安装技能。先检查是否已有同名版本，避免覆盖。安装后核对 SKILL.md 的 name、技能列表和本次实际加载情况；只检查能力，不生成图片。
+python <skill目录>/scripts/render_layout.py <项目目录>/layout.json --out <项目目录>/renders/v001 --font <实际字体文件>
 ```
 
-手动安装时，官方文档当前列出的用户范围目录为 `~/.agents/skills`，仓库范围目录为 `.agents/skills`。Windows 用户范围对应 `%USERPROFILE%\.agents\skills\codex-visual-director\SKILL.md`。只复制完整的 `codex-visual-director` 文件夹。Codex 会检测技能变更；未出现时重启再检查。
+依赖 Pillow 和 fonttools；字体由本机提供，技能不捆绑字体或自动下载。依赖不存在时报告具体缺项并遵从本机安装授权。project.py 和 techniques.py 不受这些排版依赖影响。
 
-安装成功、当前会话实际加载、原生图像工具可用、作品达到目标，是四个不同检查。这里提供的是技能和使用说明，不表示已安装到你 PC 的本地 Codex。
+从 [布局样例](../codex-visual-director/assets/layout-example.json) 复制并修改。输出 PNG、含文字和嵌入字体子集的 SVG、实际墨迹报告。检查缺字、文字越界、安全区、文字重叠、保护区以及已声明的最低字高；未知字段与旧输出前缀会被拒绝。实际改标题后用新前缀重渲，验证变化生效。
 
-官方依据（核对日期：2026-10-26）：[Build skills](https://learn.chatgpt.com/docs/build-skills)。具体模型和图像能力以当前会话暴露的工具与宿主说明为准，不拿 API 能力反推某个 Codex 客户端必然具备同样控制。
+样例是纯文字排版演示，没有右侧人物素材，不算成品插画。PNG 的几何检查不等于设计通过；SVG 在目标软件的字体呈现和可编辑性仍需重开验证，不保证跨渲染器像素一致。详细字段与边界见 [Layout Planner](../codex-visual-director/references/layout-planner.md)，字形任务另看 [字形规则](../codex-visual-director/references/type-glyph.md)。
 
-## 7. 开始与接续
-
-新任务可以这样发给 Codex：
+## 5. 招式检索与经验
 
 ```text
-使用 $codex-visual-director。为我设计一张 16:9 的日系动画插画，重点是人物与环境融合的故事瞬间。先给简短导演判断；信息足够就直接制作首稿，实际审图后只修最重要的问题。只使用当前可用的 GPT 和 OpenAI 原生图像工具。项目保存在我指定的工作目录。
+python <skill目录>/scripts/techniques.py search --query "人物与环境 叙事 动作" --task-type character
+python <skill目录>/scripts/techniques.py search --query "字高 可读性" --task-type type --limit 3
+python <skill目录>/scripts/techniques.py add --library <项目目录>/style-cards.json --card <本次卡片.json>
 ```
 
-接续时给项目目录并明确动作，例如：
+使用标准库关键词检索，不依赖向量库、网络服务或其他模型。返回机制、条件、反例与证据；相关性分数不是审美评分。可无命中。新增经验写项目库，保留命名空间；同 ID 冲突拒绝覆盖，内置库不在设计任务中改写。
+
+proposed → observed → tested → supported 由实际证据决定，脚本检查通过不会使艺术招式晋级。历史报告标 reported；保存卡片不等于模型训练、自动学习或自动跨会话记忆。完整说明见 [Style Kit 与招式库](../codex-visual-director/references/style-kit-and-techniques.md)。
+
+## 6. 安装与更新
+
+首次安装让本机 Codex 使用 $skill-installer，从 Alyzeus/gpt-visual-director 仓库的 codex-visual-director 子目录安装，核对 SKILL.md 的 name 和当前实际加载情况。只下载本仓库不算安装。
+
+已有版本先找当前 Codex 实际加载的同名目录，备份目录及本地修改，再在原位更新完整 19 个文件。可能位于用户技能目录或项目目录；以本机实际加载路径为准，避免在另一个目录重复安装。安装目录里已有作品或个人经验时先迁出并保留。
+
+可把下面的话交给本机 Codex：
 
 ```text
-使用 $codex-visual-director，读取这个项目的 TASK_STATE.json、完整 brief.md、当前方向和选定稿。本轮先恢复目标、版本和未完成动作，不生成图片；确认状态后再执行我接下来的修改要求。
+更新我已安装的 codex-visual-director：从 Alyzeus/gpt-visual-director 的 main 分支读取 codex-visual-director 目录，先定位当前实际加载位置并完整备份，保留本地修改和个人项目，再原位更新为 v1.1.0 的全部 19 个文件。核验核心版本、参考和三个脚本可读，运行不出图的检索与状态检查；检查排版依赖和字体，缺项如实报告。本轮不生成图片。更新后重新加载或新开会话验证 $codex-visual-director。
 ```
 
-## 8. 本次验证范围
+安装、实际加载、原生图像能力可用及作品达标分别检查。远端技能保存或 GitHub 发布均不代表已经改写 PC 本地文件。宿主安装规则参考 [Build skills](https://learn.chatgpt.com/docs/build-skills)；具体工具与模型以当前会话提供的能力为准。
 
-- 技能结构与引用：通过格式及本地引用检查。
-- 本地文件工具：14 项测试通过，覆盖保留原 Brief、重复版本拒绝、真实旧稿回取、冲突不覆盖、缺件、换目录及损坏状态报告。
-- 隔离 GPT 上下文试跑：两项通过。只讨论时没有生成图片且给出不同方向；仅凭项目文件恢复时，找回完整约束、V2 制作版、V1 选定稿及未执行的修改，并识别测试色块不是成品。
-- 原生生图、精确局部编辑、实际排版渲染、用户 PC 的运行：本次没有执行，不计为已通过。
+## 7. 使用与接续
 
-16 个行为用例位于 [references/evaluations.md](../codex-visual-director/references/evaluations.md)，是下一步可选验收任务，不是 16 项已通过的报告。
+```text
+使用 $codex-visual-director。为我设计一张 16:9 日系动画插画，重点是人物与环境融合的故事瞬间。已有方向就沿用，信息足够就制作首稿；先审方向匹配，再修最重要的问题。只使用 GPT 与当前原生图像工具，将实际版本与状态保存到指定项目目录。
+```
+
+接续时给项目根目录，要求读取 TASK_STATE.json、完整 Brief、当前方向和选定稿。核对 Brief 修订与检查点范围、最新制作版与主版、预算和结果未知的调用，再执行一个明确下一步。不要依赖聊天摘要覆盖原目标。
+
+## 8. 验证记录与边界
+
+v1.1.0 的本地工具检查共 48 项：项目状态与回退 20 项、招式检索与新增 8 项、真实字体排版 20 项。覆盖旧项目兼容、路径与冲突保护、参考和检查点记录、无命中与卡片冲突、中文 PNG、SVG 字体子集、改标题重渲、字体集合、缺字、越界和保护区等。测试图形均为程序构造的排版或色块，不是生图质量样本。
+
+两个最终隔离 GPT 上下文任务通过：沿用已确定方向、只整理制作卡并检索未验证招式；实际查看批准参考与偏离稿，先识别方向不匹配再裁决。本次还实际查看了排版 PNG。未运行原生生图或精确局部改图，未在用户 Windows 上执行本轮更新，不把工具检查解释为审美或生图链路已验收。
+
+可复跑工具检查：
+
+```text
+python tests/test_codex_tools.py --cjk-font <本机实际中文字体> --latin-font <本机实际拉丁字体> --output <临时测试目录>
+```
+
+需要 Python、Pillow、fonttools；字体不随测试下载。测试保留实际结果供检查，不联网也不调用模型。[27 个行为用例](../codex-visual-director/references/evaluations.md) 是验收设计，不能把它们全部记为已经运行。

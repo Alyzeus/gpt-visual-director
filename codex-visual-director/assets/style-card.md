@@ -1,4 +1,6 @@
-# STYLE-001 · 招式名称
+# PROJECT-T001 · 招式名称
+
+- ID、任务类型与检索标签：
 
 - 机制与可见关系：
 - 用途：
@@ -8,7 +10,8 @@
 - 来源与作品版本：
 - 实际观察：
 - 推断及未验证项：
-- 状态：observed / tested / supported
+- 状态：proposed / observed / tested / supported
+- 证据核验：reported / checked / unverified
 - 下一次可验证的假设：
 
 保留与既有经验冲突的条件和证据。此卡是文件知识，不是模型自动训练，也不保证新会话自动加载。

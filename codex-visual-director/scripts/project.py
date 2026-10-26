@@ -34,7 +34,7 @@ def inside(root, relative):
 
 def load(root):
     data = json.loads((root / STATE).read_text(encoding="utf-8"))
-    if data.get("schema_version") != 1 or not isinstance(data.get("versions"), dict):
+    if not isinstance(data, dict) or data.get("schema_version") != 1 or not isinstance(data.get("versions"), dict):
         raise ValueError("Unsupported or invalid project state")
     for key, entry in data["versions"].items():
         if not VERSION.fullmatch(key) or not isinstance(entry, dict):
@@ -43,6 +43,14 @@ def load(root):
     for key in ("current_version", "selected_version"):
         if data.get(key) is not None and data[key] not in data["versions"]:
             raise ValueError("State refers to an unregistered version")
+    for key in ("references", "checkpoints"):
+        if key in data and not isinstance(data[key], dict):
+            raise ValueError("Invalid " + key + " metadata")
+    for entry in data.get("references", {}).values():
+        if not isinstance(entry, dict):
+            raise ValueError("Invalid reference entry")
+        if entry.get("location_kind") == "project_file":
+            inside(root, entry["source"])
     return data
 
 
@@ -101,6 +109,8 @@ def init_project(args, root):
         "selected_version": None,
         "selected_artifact": None,
         "versions": {},
+        "references": {},
+        "checkpoints": {},
         "next_action": "读取并补全 brief.md 中的有效需求",
         "created_at": now(),
     }
@@ -182,6 +192,9 @@ def project_status(root, data):
     paths["brief"] = data.get("brief", "brief.md")
     if data.get("selected_artifact"):
         paths["selected_artifact"] = data["selected_artifact"]
+    for key, entry in data.get("references", {}).items():
+        if entry.get("location_kind") == "project_file":
+            paths["reference:" + key] = entry["source"]
     for key, relative in paths.items():
         p = inside(root, relative)
         if not p.is_file() or p.stat().st_size == 0:
@@ -189,6 +202,53 @@ def project_status(root, data):
     return {"status": "loaded", "project": str(root), "state": data,
             "storage_ok": not missing, "missing_or_empty": missing,
             "scope": "file presence only; not image decoding or visual acceptance"}
+
+
+def record_reference(args, root, data):
+    if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", args.id):
+        raise ValueError("Reference ID must use letters, numbers, underscores or hyphens")
+    references = data.setdefault("references", {})
+    if args.id in references:
+        raise ValueError("Reference ID already recorded; use a new revision ID")
+    if args.source.startswith(("https://", "http://")):
+        source, location = args.source, "url"
+    else:
+        path = inside(root, args.source)
+        if not path.is_file() or not path.stat().st_size:
+            raise ValueError("Local reference must be a nonempty project file")
+        source, location = path.relative_to(root).as_posix(), "project_file"
+    if args.inspection == "viewed" and not args.evidence.strip():
+        raise ValueError("A viewed reference needs recorded inspection evidence")
+    references[args.id] = {"source": source, "location_kind": location, "origin": args.origin,
+                           "roles": sorted(set(args.role)), "inspection": args.inspection,
+                           "inspection_evidence": args.evidence, "note": args.note,
+                           "recorded_at": now()}
+    save(root, data)
+    return {"status": "reference_recorded", "id": args.id,
+            "scope": "declared reference metadata; no fetch, image inspection or edit-input verification"}
+
+
+def record_checkpoint(args, root, data):
+    if args.version and args.version not in data["versions"]:
+        raise ValueError("Checkpoint version is not registered")
+    if args.name == "match" and not args.version:
+        raise ValueError("A match checkpoint must name the reviewed version")
+    if not args.evidence.strip() or not args.brief_revision.strip():
+        raise ValueError("Checkpoint needs evidence and a Brief revision label")
+    entry = {"name": args.name, "status": args.result, "basis": args.basis,
+             "brief_revision": args.brief_revision, "version": args.version,
+             "evidence": args.evidence, "note": args.note, "recorded_at": now()}
+    # Append-only records: changes to the Brief cannot silently reuse an old pass.
+    records = data.setdefault("checkpoints", {})
+    serial = len(records) + 1
+    key = args.name + "-" + str(serial).zfill(3)
+    while key in records:
+        serial += 1
+        key = args.name + "-" + str(serial).zfill(3)
+    records[key] = entry
+    save(root, data)
+    return {"status": "checkpoint_recorded", "id": key, "checkpoint": entry,
+            "scope": "record only; not automatic approval, visual proof or stage completion"}
 
 
 def main():
@@ -215,6 +275,24 @@ def main():
     p.add_argument("--next", dest="next_action", required=True)
     p = commands.add_parser("status", help="Read state and check registered file presence")
     p.add_argument("project")
+    p = commands.add_parser("reference", help="Record a reference origin and intended roles")
+    p.add_argument("project")
+    p.add_argument("--id", required=True)
+    p.add_argument("--source", required=True, help="Project-relative file or explicit URL")
+    p.add_argument("--origin", choices=("user", "external", "generated", "unknown"), required=True)
+    p.add_argument("--role", action="append", choices=("identity", "style", "layout", "edit_input", "comparison"), required=True)
+    p.add_argument("--inspection", choices=("viewed", "unverified"), default="unverified")
+    p.add_argument("--evidence", default="")
+    p.add_argument("--note", default="")
+    p = commands.add_parser("checkpoint", help="Record evidence for a particular Brief revision")
+    p.add_argument("project")
+    p.add_argument("--name", choices=("alignment", "preflight", "match"), required=True)
+    p.add_argument("--result", choices=("pass", "partial", "fail", "uncertain", "not_applicable"), required=True)
+    p.add_argument("--basis", choices=("user_selected", "delegated", "inherited", "self_check"), required=True)
+    p.add_argument("--brief-revision", required=True)
+    p.add_argument("--version")
+    p.add_argument("--evidence", required=True)
+    p.add_argument("--note", default="")
     args = parser.parse_args()
     root = Path(args.project).expanduser().resolve()
     try:
@@ -231,6 +309,10 @@ def main():
                 data["next_action"] = args.next_action
                 save(root, data)
                 result = {"status": "updated", "stage": args.stage, "next_action": args.next_action}
+            elif args.command == "reference":
+                result = record_reference(args, root, data)
+            elif args.command == "checkpoint":
+                result = record_checkpoint(args, root, data)
             else:
                 result = project_status(root, data)
         print(json.dumps(result, ensure_ascii=False, indent=2))

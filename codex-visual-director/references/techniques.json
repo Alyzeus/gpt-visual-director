@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "cards": [
+    {
+      "id": "VD-T001",
+      "title": "让动作与环境互相解释",
+      "status": "proposed",
+      "task_types": ["character", "illustration"],
+      "tags": ["人物", "环境", "叙事", "门把", "视线", "重心"],
+      "problem": "人物漂亮但像贴在背景前，缺乏正在发生的事情",
+      "mechanism": "选择一个有明确空间关系的动作锚点，用视线、身体朝向、接触或遮挡让环境参与叙事",
+      "use_when": "需要表现人物与环境融合的故事瞬间；有足够景别容纳相邻物体",
+      "avoid_when": "纯肖像或用户要求中性设定图；不要让静态图承担动作先后证明",
+      "evidence": []
+    },
+    {
+      "id": "VD-T002",
+      "title": "用空间中的光源组织冷暖",
+      "status": "proposed",
+      "task_types": ["character", "illustration", "promo"],
+      "tags": ["氛围", "冷暖", "光影", "空间", "动画"],
+      "problem": "画面加了光晕仍缺少氛围，人物与背景光线脱节",
+      "mechanism": "先确定室内外或前后景的真实光源分工，再让人物受光、投影和环境反射支持同一空间",
+      "use_when": "有可辨认的光源与空间分界，需要层次和情绪",
+      "avoid_when": "平面图形语言优先或参考为均匀照明；冷暖对比不能覆盖身份色和材质要求",
+      "evidence": []
+    },
+    {
+      "id": "VD-T003",
+      "title": "将目标收益与非目标漂移分开验收",
+      "status": "observed",
+      "task_types": ["general"],
+      "tags": ["局部编辑", "回退", "高光", "版本对比", "表演"],
+      "problem": "新版更亮更细，却未明显改善手部或表情等原定修改目标",
+      "mechanism": "分别记录目标收益和保留项变化，收益不足时允许保留旧稿",
+      "use_when": "已有可取回的父版本和明确修改目标",
+      "avoid_when": "两版不可见或任务已经正式更换方向；不能只凭更亮判定新旧优劣",
+      "evidence": [
+        {
+          "ref": "references/evaluations.md：既有《雨后的回眸》试验摘要",
+          "observation": "历史记录中局部目标收益有限且出现非目标光影变化，最终保留 V1；本卡未新增生图试验",
+          "verification": "reported"
+        }
+      ]
+    },
+    {
+      "id": "VD-T004",
+      "title": "以可见墨迹验证文字尺度",
+      "status": "proposed",
+      "task_types": ["editorial", "promo", "type"],
+      "tags": ["字体", "字高", "排版", "字号", "可读性"],
+      "problem": "字号参数正确，实际文字仍太小、过挤或触碰裁切边缘",
+      "mechanism": "用实际字体渲染后测量每行墨迹边界、保护区和阅读距离，再调字号与行距",
+      "use_when": "准确文案与版式尺度影响交付，存在可用字体和渲染器",
+      "avoid_when": "只有 JSON 文本框而没有真实渲染；像素检查不能证明整体审美",
+      "evidence": []
+    },
+    {
+      "id": "VD-T005",
+      "title": "为标题留出有主次的独立区域",
+      "status": "proposed",
+      "task_types": ["editorial", "promo", "type"],
+      "tags": ["标题", "留白", "层级", "保护区", "海报"],
+      "problem": "标题与人物争抢注意，文字不断压住脸或关键动作",
+      "mechanism": "先划定主体保护区与阅读顺序，借构图留出标题区域，再用真实文案测试占用",
+      "use_when": "主视觉和信息都重要且可以提前协调构图",
+      "avoid_when": "用户批准了有意遮挡的实验版式；不要为了套模板破坏已有叙事",
+      "evidence": []
+    },
+    {
+      "id": "VD-T006",
+      "title": "用形态行为支撑材质",
+      "status": "proposed",
+      "task_types": ["illustration", "character", "promo"],
+      "tags": ["材质", "布料", "形态", "褶皱", "反光"],
+      "problem": "加了纹理但物体仍显厚重、坚硬或与预期材质不符",
+      "mechanism": "同时检查边缘厚度、受力、弯折、反光和纹理尺度，让它们说明同一种材料",
+      "use_when": "材质是表达或角色服装的重要部分",
+      "avoid_when": "平面符号化表现不追求物理写实；不能用写实规则否定已批准的风格化",
+      "evidence": []
+    },
+    {
+      "id": "VD-T007",
+      "title": "先保证字形识读再增加变形",
+      "status": "proposed",
+      "task_types": ["type", "promo", "editorial"],
+      "tags": ["字形", "字体设计", "标题", "识读", "负空间"],
+      "problem": "装饰字很有风格，但关键笔画和字内空间让人读错",
+      "mechanism": "保留字的识别骨架与关键负空间，逐级增加切角、连笔或材质并用实际尺寸复查",
+      "use_when": "短标题、字标或明确允许探索的字形设计",
+      "avoid_when": "长正文、公式、逐字正确性优先的说明信息；复杂造字不可承诺由简单排版脚本完成",
+      "evidence": []
+    }
+  ]
+}

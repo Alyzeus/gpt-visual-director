@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "canvas": {"width": 1200, "height": 1800},
+  "background": {"color": "#10233A"},
+  "safe_margin": 72,
+  "protected_regions": [{"id": "subject", "rect": [650, 200, 470, 1100]}],
+  "blocks": [
+    {"id": "title", "text": "雨后的\n回眸", "rect": [96, 180, 500, 320], "font_size": 100, "line_height": 140, "align": "left", "color": "#F6EDD9", "wrap": true, "min_ink_height": 70},
+    {"id": "subtitle", "text": "人物与环境共同叙事", "rect": [100, 600, 500, 100], "font_size": 32, "line_height": 48, "color": "#B7C9D9", "wrap": true, "min_ink_height": 22},
+    {"id": "caption", "text": "LAYOUT STUDY / 01", "rect": [100, 1590, 700, 80], "font_size": 28, "line_height": 42, "color": "#B7C9D9", "wrap": false}
+  ]
+}
