@@ -16,6 +16,10 @@ The original Chinese and English editions include the full workflow, three refer
 
 原有中英文两版均包含完整工作流、三份参考规则、两份模板、显示元数据和 12 个手动测试用例。中文原版保留原有内容，英文版使用独立的技能标识。Codex v1.1.0 补充视觉对齐、先匹配后细审、可运行 PNG/SVG 排版、可检索招式和本地版本工具，使用 GPT 与 OpenAI 原生图像能力。
 
+Codex v1.1.2 adds concise production prompts, explicit visual priorities, ongoing identity checks, and [field lessons](codex-visual-director/references/field-lessons.md) with conditions and counterexamples. These are limited observations, not measured causal improvements.
+
+Codex v1.1.2 补充精简制作指令、视觉优先级、持续身份核验及[实作经验](codex-visual-director/references/field-lessons.md)，保留适用条件与反例；有限观察不等于已证明 Skill 的因果增益。
+
 ## Workflow / 工作流
 
 | Stage | Purpose | 内容 |
@@ -31,4 +35,4 @@ Choose an edition and follow its installation notes for the host you use. Clonin
 
 选择一个语言版本，并按对应说明在支持技能的宿主中安装。下载本仓库不等于安装完成。图像能力由宿主提供；本技能不会自动接入 Photoshop、ComfyUI 或外部绘图后端，经验卡也不等于自动跨会话记忆。
 
-ChatGPT editions / 原中英文版: 1.0.0 · Codex edition / Codex 版: 1.1.0
+ChatGPT editions / 原中英文版: 1.0.0 · Codex edition / Codex 版: 1.1.2
